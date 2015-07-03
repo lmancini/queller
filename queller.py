@@ -2,6 +2,41 @@
 
 from collections import deque
 
+# Quell levels
+
+# Introduction
+shelf1928_level1 = """
+  x xxxxx
+ x    p  x
+x p d   pxx
+ x    px x
+  x x x x
+"""
+
+# Easy going
+shelf1928_level2 = """
+ xxxxxxxx
+xxp      x
+xp        x
+ x        x
+  xxxxx   x
+      x   x
+      xpd x
+       xxx
+"""
+
+# Side to side
+shelf1928_level3 = """
+xxxxxxxxxxx
+  p xxxp
+     x
+  d  xp
+  x  x   x
+    pxx
+    xxxx
+xxxxxxxxxxx
+"""
+
 level1 = """
   xxxxx
   xxpxx
@@ -25,12 +60,14 @@ xxxxxxxxxxxxxxx
 
 DROPS = ["d"]
 
+
 class InsDeque(deque):
 
     def insert(self, index, value):
         self.rotate(-index)
         self.appendleft(value)
         self.rotate(index)
+
 
 class Type(object):
     BLOCK = 0
@@ -39,9 +76,11 @@ class Type(object):
     GOLD = 3
     RING = 4
 
+
 class DropState(object):
     NORMAL = 0
     GOLD = 1
+
 
 class Drop(object):
     def __init__(self, board):
@@ -55,10 +94,14 @@ class Drop(object):
         if not ok:
             return False
 
+
 class Board(object):
     def __init__(self, level, drops_positions, remaining_pearls):
         # Note, no copy; client is supposed to provide one
         self.level = level
+
+        self.width = max(len(line) for line in level)
+        self.height = len(level)
 
         # {which -> (x, y)}
         # Note, see above
@@ -67,8 +110,18 @@ class Board(object):
         self.remaining_pearls = remaining_pearls
 
     @staticmethod
-    def fromString(level):
-        level = [list(line) for line in level.split('\n')][1:-1]
+    def fromString(level_str):
+        level = []
+        width = 0
+        for line in level_str.split('\n')[1:-1]:
+            level.append(list(line))
+            width = max(width, len(line))
+
+        # Pad until all rows are max width long.
+        for line in level:
+            while len(line) < width:
+                line.append(' ')
+
         drops_positions = {}
         for dd in DROPS:
             pos = Board.getDropPosition(dd, level)
@@ -79,7 +132,7 @@ class Board(object):
     @staticmethod
     def remainingPearls(level):
         pearls = 0
-        for line in level:    
+        for line in level:
             for c in line:
                 if c == "p":
                     pearls += 1
@@ -112,7 +165,32 @@ class Board(object):
 
             pos = new_drops_positions[drop]
 
-            next_pos = pos[0] + dx, pos[1] + dy
+            # Apply direction and update drop position, keeping wraps into
+            # account
+            if pos[0] == 0 and dx == -1:
+                next_pos_x = self.width - 1
+                next_pos_y = pos[1] + dy
+
+            elif pos[0] == self.width - 1 and dx == 1:
+                next_pos_x = 0
+                next_pos_y = pos[1] + dy
+
+            elif pos[1] == 0 and dy == -1:
+                next_pos_x = pos[0] + dx
+                next_pos_y = self.height - 1
+
+            elif pos[1] == self.height - 1 and dy == 1:
+                next_pos_x = pos[0] + dx
+                next_pos_y = 0
+
+            else:
+                next_pos_x = pos[0] + dx
+                next_pos_y = pos[1] + dy
+
+            assert 0 <= next_pos_x <= self.width - 1
+            assert 0 <= next_pos_y <= self.height - 1
+
+            next_pos = next_pos_x, next_pos_y
             next_block = new_level[next_pos[1]][next_pos[0]]
 
             # Check various kinds of blocks:
@@ -151,6 +229,7 @@ class Board(object):
             st += '\n'
         return st
 
+
 class Solution(object):
     def __init__(self, board, moves=None):
         self.board = board
@@ -159,6 +238,7 @@ class Solution(object):
         else:
             self.moves = moves[:]
         self.n_moves = len(self.moves)
+
 
 class Searcher(object):
     def __init__(self, board):
