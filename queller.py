@@ -37,6 +37,17 @@ xxxxxxxxxxx
 xxxxxxxxxxx
 """
 
+# No way back
+shelf1928_level4 = """
+ xxxxxxxxx
+xxp  x   xx
+x x  x x  x
+x  p g    x
+x    x    x
+xxd  x  pxx
+ xxxxxxxxx
+"""
+
 level1 = """
   xxxxx
   xxpxx
@@ -146,6 +157,36 @@ class Board(object):
                     return (x, y)
         raise RuntimeError()
 
+    def nextDropPos(self, pos, dx, dy):
+        # Apply direction and update drop position, keeping wraps into
+        # account
+        if pos[0] == 0 and dx == -1:
+            next_pos_x = self.width - 1
+            next_pos_y = pos[1] + dy
+
+        elif pos[0] == self.width - 1 and dx == 1:
+            next_pos_x = 0
+            next_pos_y = pos[1] + dy
+
+        elif pos[1] == 0 and dy == -1:
+            next_pos_x = pos[0] + dx
+            next_pos_y = self.height - 1
+
+        elif pos[1] == self.height - 1 and dy == 1:
+            next_pos_x = pos[0] + dx
+            next_pos_y = 0
+
+        else:
+            next_pos_x = pos[0] + dx
+            next_pos_y = pos[1] + dy
+
+        assert 0 <= next_pos_x <= self.width - 1
+        assert 0 <= next_pos_y <= self.height - 1
+
+        next_pos = next_pos_x, next_pos_y
+
+        return next_pos
+
     def move(self, drop, step):
         assert step in ("up", "down", "left", "right")
 
@@ -165,32 +206,8 @@ class Board(object):
 
             pos = new_drops_positions[drop]
 
-            # Apply direction and update drop position, keeping wraps into
-            # account
-            if pos[0] == 0 and dx == -1:
-                next_pos_x = self.width - 1
-                next_pos_y = pos[1] + dy
+            next_pos = self.nextDropPos(pos, dx, dy)
 
-            elif pos[0] == self.width - 1 and dx == 1:
-                next_pos_x = 0
-                next_pos_y = pos[1] + dy
-
-            elif pos[1] == 0 and dy == -1:
-                next_pos_x = pos[0] + dx
-                next_pos_y = self.height - 1
-
-            elif pos[1] == self.height - 1 and dy == 1:
-                next_pos_x = pos[0] + dx
-                next_pos_y = 0
-
-            else:
-                next_pos_x = pos[0] + dx
-                next_pos_y = pos[1] + dy
-
-            assert 0 <= next_pos_x <= self.width - 1
-            assert 0 <= next_pos_y <= self.height - 1
-
-            next_pos = next_pos_x, next_pos_y
             next_block = new_level[next_pos[1]][next_pos[0]]
 
             # Check various kinds of blocks:
@@ -213,6 +230,18 @@ class Board(object):
             elif next_block == "x":
                 # We can't move there, stop
                 break
+            elif next_block == "g":
+                # A gate. Change this into a block and assume it's fine to
+                # forcefully move the drop ahead.
+                new_level[pos[1]][pos[0]] = " "
+                new_level[next_pos[1]][next_pos[0]] = "x"
+
+                next_pos = self.nextDropPos(next_pos, dx, dy)
+                new_level[next_pos[1]][next_pos[0]] = "d"
+
+                new_drops_positions["d"] = next_pos
+                moved = True
+                continue
             else:
                 assert False, next_block
 
@@ -288,6 +317,6 @@ class Searcher(object):
                 self.solutions.insert(ii, new_solution)
 
 if __name__ == "__main__":
-    board = Board.fromString(levelx)
+    board = Board.fromString(shelf1928_level4)
     searcher = Searcher(board)
     searcher.search()
