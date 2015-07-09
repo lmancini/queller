@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 
-from collections import deque
+from collections import defaultdict
 
 # Quell levels
 
@@ -72,47 +72,26 @@ xxxxxxxxxxxxxxx
 DROPS = ["d"]
 
 
-class InsDeque(deque):
-
-    def insert(self, index, value):
-        self.rotate(-index)
-        self.appendleft(value)
-        self.rotate(index)
-
-
-class Type(object):
-    BLOCK = 0
-    PEARL = 1
-    TOPAZ = 2
-    GOLD = 3
-    RING = 4
-
-
-class DropState(object):
-    NORMAL = 0
-    GOLD = 1
-
-
 class Drop(object):
     def __init__(self, board):
         self.board = board
         self.position = (None, None)
-        self.state = DropState.NORMAL
-
-    def move(self, direction):
-        # If it's possible to move there, update position and drop state
-        ok = self.board.move(self, direction)
-        if not ok:
-            return False
 
 
 class Board(object):
-    def __init__(self, level, drops_positions, remaining_pearls):
+    def __init__(self, level, drops_positions, remaining_pearls, width=None, height=None):
         # Note, no copy; client is supposed to provide one
         self.level = level
 
-        self.width = max(len(line) for line in level)
-        self.height = len(level)
+        if width is None:
+            self.width = max(len(line) for line in level)
+        else:
+            self.width = width
+
+        if height is None:
+            self.height = len(level)
+        else:
+            self.height = height
 
         # {which -> (x, y)}
         # Note, see above
@@ -246,7 +225,7 @@ class Board(object):
                 assert False, next_block
 
         if moved:
-            return Board(new_level, new_drops_positions, new_remaining_pearls)
+            return Board(new_level, new_drops_positions, new_remaining_pearls, self.width, self.height)
 
         return None
 
@@ -265,28 +244,68 @@ class Solution(object):
         if moves is None:
             self.moves = []
         else:
-            self.moves = moves[:]
+            # No copy!
+            self.moves = moves
         self.n_moves = len(self.moves)
+
+    def __repr__(self):
+        g = self.n_moves
+        h = self.board.remaining_pearls
+        return "Solution(f=%s, g=%s, h=%s)" % (g + h, g, h)
+
+
+class SolutionDict(object):
+
+    def __init__(self):
+        self._dict = defaultdict(list)
+        self._indices = defaultdict(int)
+
+    def append(self, solution):
+        self.ordered_insert(solution)
+
+    def popleft(self):
+        # doesn't actually delete the popped item - we still need that
+        # for duplicate check in ordered_insert
+        for m in sorted(self._dict):
+            idx = self._indices[m]
+            l = self._dict[m]
+            if idx < len(l):
+                rv = l[idx]
+                self._indices[m] += 1
+                break
+
+        return rv
+
+    def ordered_insert(self, solution):
+        # f = g + h
+        f = solution.n_moves + solution.board.remaining_pearls
+
+        # Check for equal board states but with less moves: don't add this
+        # if we find one - note: this is crucial to get decent computing times
+
+        for m in sorted(self._dict):
+            if m < f:
+                for ss in self._dict[m]:
+                    if ss.board.level == solution.board.level:
+                        return
+            else:
+                break
+
+        self._dict[f].append(solution)
 
 
 class Searcher(object):
     def __init__(self, board):
         self.board = board
 
-    def heur(self, solution):
-        return solution.board.remaining_pearls
-
-    def steps(self, solution):
-        return solution.n_moves + self.heur(solution)
-
     def search(self):
-        self.solutions = InsDeque()
+        self.solutions = SolutionDict()
         self.solutions.append(Solution(self.board))
 
         depth = 0
 
         while self.solutions:
-            s = self.solutions.pop()
+            s = self.solutions.popleft()
 
             board = s.board
             moves = s.moves
@@ -297,7 +316,6 @@ class Searcher(object):
 
             if board.remaining_pearls == 0:
                 print moves
-                print "done!"
                 return
 
             for direction in ("up", "down", "left", "right"):
@@ -306,17 +324,11 @@ class Searcher(object):
                     continue
 
                 new_solution = Solution(next_board, moves + [direction])
-                cur_f = self.steps(new_solution)
 
                 # Ordered insert
-                ii = 0
-                for ii, ss in enumerate(self.solutions):
-                    target_f = self.steps(ss)
-                    if cur_f > target_f:
-                        break
-                self.solutions.insert(ii, new_solution)
+                self.solutions.ordered_insert(new_solution)
 
 if __name__ == "__main__":
-    board = Board.fromString(shelf1928_level4)
+    board = Board.fromString(levelx)
     searcher = Searcher(board)
     searcher.search()
