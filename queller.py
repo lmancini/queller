@@ -2,73 +2,6 @@
 
 from collections import defaultdict
 
-# Quell levels
-
-# Introduction
-shelf1928_level1 = """
-  x xxxxx
- x    p  x
-x p d   pxx
- x    px x
-  x x x x
-"""
-
-# Easy going
-shelf1928_level2 = """
- xxxxxxxx
-xxp      x
-xp        x
- x        x
-  xxxxx   x
-      x   x
-      xpd x
-       xxx
-"""
-
-# Side to side
-shelf1928_level3 = """
-xxxxxxxxxxx
-  p xxxp
-     x
-  d  xp
-  x  x   x
-    pxx
-    xxxx
-xxxxxxxxxxx
-"""
-
-# No way back
-shelf1928_level4 = """
- xxxxxxxxx
-xxp  x   xx
-x x  x x  x
-x  p g    x
-x    x    x
-xxd  x  pxx
- xxxxxxxxx
-"""
-
-level1 = """
-  xxxxx
-  xxpxx
-  x   x
-  x d x
-xx     xx
-x  p xp x
-x       x
-xxxxxxxxx
-"""
-
-levelx = """
-xxxxxxxxxxxxxxx
-xx p    x   xxx
-x    px   xp xx
-x   p  xp     x
-xxd  x     x xx
-xxx  px  x pxxx
-xxxxxxxxxxxxxxx
-"""
-
 DROPS = ["d"]
 
 
@@ -295,8 +228,9 @@ class SolutionDict(object):
 
 
 class Searcher(object):
-    def __init__(self, board):
+    def __init__(self, board, verbose=False):
         self.board = board
+        self.verbose = verbose
 
     def search(self):
         self.solutions = SolutionDict()
@@ -312,11 +246,13 @@ class Searcher(object):
 
             if s.n_moves > depth:
                 depth = s.n_moves
-                print depth
+                if self.verbose:
+                    print depth
 
             if board.remaining_pearls == 0:
-                print moves
-                return
+                if self.verbose:
+                    print moves
+                return moves
 
             for direction in ("up", "down", "left", "right"):
                 next_board = board.move("d", direction)
@@ -329,6 +265,7 @@ class Searcher(object):
                 self.solutions.ordered_insert(new_solution)
 
 if __name__ == "__main__":
-    board = Board.fromString(levelx)
-    searcher = Searcher(board)
+    from test_queller import shelf1937_level4
+    board = Board.fromString(shelf1937_level4)
+    searcher = Searcher(board, verbose=True)
     searcher.search()
