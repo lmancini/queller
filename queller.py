@@ -1,4 +1,5 @@
 #!/usr/bin/env python
+# coding: utf-8
 
 from collections import defaultdict
 
@@ -68,6 +69,15 @@ class Board(object):
                 if c == which:
                     return (x, y)
         raise RuntimeError()
+
+    @staticmethod
+    def getRingPositions(level):
+        rv = []
+        for y, line in enumerate(level):
+            for x, c in enumerate(line):
+                if c == 'o':
+                    rv.append((x, y))
+        return rv
 
     def nextDropPos(self, pos, dx, dy):
         # Apply direction and update drop position, keeping wraps into
@@ -177,6 +187,29 @@ class Board(object):
             elif next_block == "+":
                 moved = False
                 break
+
+            # A ring. Look for the other ring in the board, move the drop there
+            # and forcefully make it do another step (to avoid recursion).
+            elif next_block == "o":
+                rings = self.getRingPositions(new_level)
+
+                # Remove this ring from the list
+                del rings[rings.index(next_pos)]
+                assert len(rings) == 1
+                other_ring_pos = rings[0]
+
+                new_level[pos[1]][pos[0]] = " "
+
+                next_pos = self.nextDropPos(other_ring_pos, dx, dy)
+                new_level[next_pos[1]][next_pos[0]] = "d"
+
+                new_drops_positions["d"] = next_pos
+                moved = True
+                continue
+
+            # Gender signs.
+            elif next_block in ("♂", "♀"):
+                assert False, next_block
 
             else:
                 assert False, next_block
@@ -289,7 +322,7 @@ class Searcher(object):
                 self.solutions.ordered_insert(new_solution)
 
 if __name__ == "__main__":
-    from test_queller import shelf1928_level8
-    board = Board.fromString(shelf1928_level8)
+    from test_queller import shelf1928_level10
+    board = Board.fromString(shelf1928_level10)
     searcher = Searcher(board, verbose=True)
     searcher.search()

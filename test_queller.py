@@ -1,4 +1,5 @@
 #!/usr/bin/env python
+# coding: utf-8
 
 from queller import Board
 from queller import Searcher
@@ -95,6 +96,27 @@ xx   +    xx
 xxxxxxxxxxxx
 """
 
+# A certain ring
+shelf1928_level9 = """
+ xxxxx
+x    ox
+x  pxxx
+xx xxpx
+x dxo x
+ xxxxx
+"""
+
+# Step in the right direction
+shelf1928_level10 = """
+  xxx   xx
+ xv  xxx  x
+xx  xxxx  xx
+xxop xp  oxx
+xx   xxx  xx
+ x  pxxxd x
+  xxx   xx
+"""
+
 # Worth its weight
 shelf1937_level4 = """
 xxxxxxxxxxxxxxx
@@ -163,6 +185,18 @@ class TestQueller(unittest.TestCase):
         self.solution_should_be(
             shelf1928_level8,
             ['left', 'down', 'right', 'up', 'left', 'up', 'right', 'down', 'right', 'up'],
+        )
+
+    def test_shelf1928_level9(self):
+        self.solution_should_be(
+            shelf1928_level9,
+            ['up', 'right', 'up', 'down', 'left', 'down', 'right'],
+        )
+
+    def test_shelf1928_level10(self):
+        self.solution_should_be(
+            shelf1928_level10,
+            ['up', 'right', 'down', 'right', 'up', 'left'],
         )
 
     def test_shelf1937_level4(self):
