@@ -154,6 +154,30 @@ class Board(object):
                 new_drops_positions["d"] = next_pos
                 moved = True
                 continue
+
+            # Spikes. We handle these like blocks if the drop is not hitting
+            # the sharp end; otherwise, we classify this as an impossible move
+            # by forcing this function to return None.
+            elif next_block == "<":
+                if step == "right":
+                    moved = False
+                break
+            elif next_block == ">":
+                if step == "left":
+                    moved = False
+                break
+            elif next_block == "^":
+                if step == "down":
+                    moved = False
+                break
+            elif next_block == "v":
+                if step == "up":
+                    moved = False
+                break
+            elif next_block == "+":
+                moved = False
+                break
+
             else:
                 assert False, next_block
 
@@ -265,7 +289,7 @@ class Searcher(object):
                 self.solutions.ordered_insert(new_solution)
 
 if __name__ == "__main__":
-    from test_queller import shelf1937_level4
-    board = Board.fromString(shelf1937_level4)
+    from test_queller import shelf1928_level8
+    board = Board.fromString(shelf1928_level8)
     searcher = Searcher(board, verbose=True)
     searcher.search()

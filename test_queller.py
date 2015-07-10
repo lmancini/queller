@@ -50,6 +50,51 @@ xxd  x  pxx
  xxxxxxxxx
 """
 
+# Look sharp
+shelf1928_level5 = """
+xxxxxxxxx
+xxxxxx     <
+ > p     xx
+ x   d  p x
+ xx       x
+xxx   p p x
+xxxxxxxxx
+"""
+
+# The blunt truth
+shelf1928_level6 = """
+   xx   xx
+  xxxxxxxxx
+ xxvp    vxx
+xx         xx
+xx d       xx
+ xx p ^  p x
+  xxxxxxxxx
+   xx   xx
+"""
+
+# One way
+shelf1928_level7 = """
+        pxxxx
+  xxx    v xx
+    xx>    xx
+   pxx>  d p
+    xx>    xx
+   p
+        xxxxx
+"""
+
+# Frozen
+shelf1928_level8 = """
+xxxxxxxxxxxx
+xv      xpxx
+x  g d     x
+x          x
+xp         x
+xx   +    xx
+xxxxxxxxxxxx
+"""
+
 # Worth its weight
 shelf1937_level4 = """
 xxxxxxxxxxxxxxx
@@ -94,6 +139,30 @@ class TestQueller(unittest.TestCase):
             shelf1928_level4,
             ['right', 'up', 'left', 'right', 'down', 'left', 'up', 'right',
              'up', 'left', 'down'],
+        )
+
+    def test_shelf1928_level5(self):
+        self.solution_should_be(
+            shelf1928_level5,
+            ['up', 'right', 'down', 'left', 'up'],
+        )
+
+    def test_shelf1928_level6(self):
+        self.solution_should_be(
+            shelf1928_level6,
+            ['right', 'down', 'left', 'up', 'left', 'down'],
+        )
+
+    def test_shelf1928_level7(self):
+        self.solution_should_be(
+            shelf1928_level7,
+            ['right', 'down', 'right'],
+        )
+
+    def test_shelf1928_level8(self):
+        self.solution_should_be(
+            shelf1928_level8,
+            ['left', 'down', 'right', 'up', 'left', 'up', 'right', 'down', 'right', 'up'],
         )
 
     def test_shelf1937_level4(self):
