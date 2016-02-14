@@ -117,6 +117,18 @@ xx   xxx  xx
   xxx   xx
 """
 
+# At a push (8)
+shelf1928_level11 = u"""
+    xxxxv
+ xxxp    x
+x   xxx  x
+x   ♀ p  x
+x    xx  x
+xd  ♂xxxx
+x    x
+ xxxx
+"""
+
 # Worth its weight
 shelf1937_level4 = """
 xxxxxxxxxxxxxxx
@@ -197,6 +209,12 @@ class TestQueller(unittest.TestCase):
         self.solution_should_be(
             shelf1928_level10,
             ['up', 'right', 'down', 'right', 'up', 'left'],
+        )
+
+    def test_shelf1928_level11(self):
+        self.solution_should_be(
+            shelf1928_level11,
+            [],
         )
 
     def test_shelf1937_level4(self):

@@ -207,8 +207,9 @@ class Board(object):
                 moved = True
                 continue
 
-            # Gender signs.
-            elif next_block in ("♂", "♀"):
+            # Gender signs. These are blocks that the drop can push, and that
+            # will be removed from the board when they touch another gender.
+            elif next_block in (u"♂", u"♀"):
                 assert False, next_block
 
             else:
@@ -322,7 +323,7 @@ class Searcher(object):
                 self.solutions.ordered_insert(new_solution)
 
 if __name__ == "__main__":
-    from test_queller import shelf1928_level10
-    board = Board.fromString(shelf1928_level10)
+    from test_queller import shelf1928_level11
+    board = Board.fromString(shelf1928_level11)
     searcher = Searcher(board, verbose=True)
     searcher.search()
