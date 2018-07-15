@@ -129,7 +129,41 @@ x    x
  xxxx
 """
 
-# Worth its weight
+# Down to Earth
+shelf1937_level1 = u"""
+  x  xp   x
+  x  xx   x
+ xx  g    xx
+xxxxxxxxpxxxx
+xxxxxx    xxx
+ xxpg d xxxx
+  x x  x  x
+  x  x    x
+"""
+
+# Illusion of Choice
+shelf1937_level2 = u"""
+xxxxxxx
+  xp
+x xgx x
+xpgdgpx
+x xgx x
+xx p xx
+xxxxxxx
+"""
+
+# More Haste
+shelf1937_level3 = u"""
+  p      p
+ x        x
+
+ x p gg pdx
+x x      x x
+x        x
+ x        x
+"""
+
+# Worth its Weight
 shelf1937_level4 = """
 xxxxxxxxxxxxxxx
 xx p    x   xxx
@@ -138,6 +172,37 @@ x   p  xp     x
 xxd  x     x xx
 xxx  px  x pxxx
 xxxxxxxxxxxxxxx
+"""
+
+# Tunnel Vision
+shelf1937_level5 = """
+xxxxxxxxxxxxxxx
+x g g g g   p x
+xgxxxxxxx xxxxx
+x   g   x  pg x
+x xxx x xdxxx x
+x xxx xgxxx g x
+xpxp  x  gp xxx
+xxxxxxxxxxxxxxx
+"""
+
+# The Trap
+shelf1937_level6 = """
+  xxxxxxxxxxx
+  >    p    <
+         xx
+       d  xp  p
+   +     xx
+      xxxp  x
+         x xx
+"""
+
+# Open and Shut Case
+shelf1937_level7 = """
+   g
+dgp
+  g
+g  p
 """
 
 
@@ -216,6 +281,25 @@ class TestQueller(unittest.TestCase):
             shelf1928_level11,
             [],
         )
+    del test_shelf1928_level11
+
+    def test_shelf1937_level1(self):
+        self.solution_should_be(
+            shelf1937_level1,
+            ['left', 'down', 'right', 'up', 'left', 'down', 'left', 'down'],
+        )
+
+    def test_shelf1937_level2(self):
+        self.solution_should_be(
+            shelf1937_level2,
+            ['right', 'up', 'right', 'down', 'up', 'left', 'down'],
+        )
+
+    def test_shelf1937_level3(self):
+        self.solution_should_be(
+            shelf1937_level3,
+            ['up', 'down', 'left', 'up'],
+        )
 
     def test_shelf1937_level4(self):
         self.solution_should_be(
@@ -225,6 +309,27 @@ class TestQueller(unittest.TestCase):
              'up', 'left', 'up', 'right', 'down', 'right', 'down', 'right',
              'down', 'right'],
         )
+
+    def test_shelf1937_level5(self):
+        self.solution_should_be(
+            shelf1937_level5,
+            ['up', 'right', 'left', 'down', 'up', 'right', 'left', 'down',
+             'left', 'right', 'up', 'right', 'down', 'right', 'up', 'right',
+             'up', 'left'],
+        )
+
+    def test_shelf1937_level6(self):
+        self.solution_should_be(
+            shelf1937_level6,
+            ['left', 'down', 'left', 'right', 'up', 'left'],
+        )
+
+    def test_shelf1937_level7(self):
+        self.solution_should_be(
+            shelf1937_level7,
+            [],
+        )
+    del test_shelf1937_level7
 
 if __name__ == '__main__':
     unittest.main()
