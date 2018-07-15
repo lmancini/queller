@@ -136,6 +136,12 @@ class Board(object):
                 moved = False
                 break
             went_through.add(pos)
+
+            # If by effect of the current move the board becomes solved, we
+            # should stop the move's execution
+            if Board.remainingPearls(new_level) == 0:
+                break
+
             next_pos = self.nextDropPos(pos, dx, dy)
 
             next_block = new_level[next_pos[1]][next_pos[0]]
