@@ -119,7 +119,6 @@ class Board(object):
             new_level.append(line[:])
 
         new_drops_positions = self.drops_positions.copy()
-        new_remaining_pearls = self.remaining_pearls
 
         dx = {"left": -1, "right": 1}.get(step, 0)
         dy = {"up": -1, "down": 1}.get(step, 0)
@@ -146,7 +145,6 @@ class Board(object):
                 new_level[pos[1]][pos[0]] = " "
                 new_level[next_pos[1]][next_pos[0]] = "d"
                 new_drops_positions["d"] = next_pos
-                new_remaining_pearls -= 1
                 moved = True
                 continue
             elif next_block == "x":
@@ -154,7 +152,8 @@ class Board(object):
                 break
             elif next_block == "g":
                 # A gate. Change this into a block and assume it's fine to
-                # forcefully move the drop ahead.
+                # forcefully move the drop ahead (it's not: the gate could
+                # be next to a block)
                 new_level[pos[1]][pos[0]] = " "
                 new_level[next_pos[1]][next_pos[0]] = "x"
 
@@ -216,6 +215,7 @@ class Board(object):
                 assert False, next_block
 
         if moved:
+            new_remaining_pearls = Board.remainingPearls(new_level)
             return Board(new_level, new_drops_positions, new_remaining_pearls, self.width, self.height)
 
         return None
