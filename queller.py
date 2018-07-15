@@ -123,10 +123,19 @@ class Board(object):
         dx = {"left": -1, "right": 1}.get(step, 0)
         dy = {"up": -1, "down": 1}.get(step, 0)
 
+        # Track which positions have been traveled by the drop
+        went_through = set()
+
         while True:
 
             pos = new_drops_positions[drop]
 
+            # If a traveled position appears again, it means the drop is
+            # looping and we should declare this move invalid.
+            if pos in went_through:
+                moved = False
+                break
+            went_through.add(pos)
             next_pos = self.nextDropPos(pos, dx, dy)
 
             next_block = new_level[next_pos[1]][next_pos[0]]
